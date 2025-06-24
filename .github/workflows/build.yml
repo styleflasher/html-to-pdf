@@ -61,12 +61,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: jar-files
-        path: target
-    
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v2
