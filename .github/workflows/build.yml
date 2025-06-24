@@ -1,0 +1,79 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: jar-files
+        path: target/*.jar
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+    
+    - name: Update version in pom.xml
+      run: |
+        mvn versions:set -DnewVersion=${{ env.VERSION }} -DgenerateBackupPoms=false
+    
+    - name: Update version in Java class
+      run: |
+        sed -i "s/version = \"htmlToPdf [0-9.]*\"/version = \"htmlToPdf ${{ env.VERSION }}\"/" src/main/java/at/styleflasher/htmltopdf/cli/ConvertPdfToHtml.java
+    
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: jar-files
+        path: target
+    
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release v${{ env.VERSION }}
+        files: |
+          target/html-to-pdf-${{ env.VERSION }}.jar
+          target/html-to-pdf-${{ env.VERSION }}-jar-with-dependencies.jar
+        draft: false
+        prerelease: false
