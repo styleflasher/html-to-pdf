@@ -28,11 +28,11 @@ public class ConvertPdfToHtml implements Callable<Integer> {
     @Option(names = {"-m", "--media-type"}, description = "Media type to use for conversion (print, screen, etc.)", defaultValue = "")
     private String mediaType;
 
-    @Parameters(index = "0", description = "The file whose checksum to calculate.")
-    private File file;
-
-    @Option(names = {"-o", "--output"}, description = "/var/www/example.html", required = true)
+    @Option(names = {"-o", "--output"}, description = "example.pdf", required = true)
     private String outputPath;
+
+    @Parameters(index = "0", description = "File to convert")
+    private File inputFile;
 
     @Override
     public Integer call() throws Exception {
@@ -50,13 +50,13 @@ public class ConvertPdfToHtml implements Callable<Integer> {
             converterProperties.setMediaDeviceDescription(new MediaDeviceDescription(mediaType));
         }
 
-        FileInputStream inputFile = new FileInputStream(file.getAbsolutePath());
+        FileInputStream inputFileStream = new FileInputStream(inputFile.getAbsolutePath());
 
         WriterProperties writerProperties = new WriterProperties()
             .setPdfVersion(PdfVersion.PDF_2_0);
         PdfWriter writer = new PdfWriter(outputPath, writerProperties);
 
-        HtmlConverter.convertToPdf(inputFile, writer, converterProperties);
+        HtmlConverter.convertToPdf(inputFileStream, writer, converterProperties);
 
         return 0;
     }
