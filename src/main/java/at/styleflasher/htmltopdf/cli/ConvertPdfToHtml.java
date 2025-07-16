@@ -20,6 +20,9 @@ import java.util.concurrent.Callable;
         version = "htmlToPdf 0.1")
 public class ConvertPdfToHtml implements Callable<Integer> {
 
+    @Option(names = {"-b", "--base-uri"}, description = "/var/www/html (default: output directory)", defaultValue = "")
+    private String baseUri;
+
     @Parameters(index = "0", description = "The file whose checksum to calculate.")
     private File file;
 
@@ -30,6 +33,10 @@ public class ConvertPdfToHtml implements Callable<Integer> {
     public Integer call() throws Exception {
         ConverterProperties converterProperties = new ConverterProperties()
                 .setPdfUAConformance(PdfUAConformance.PDF_UA_2);
+
+        if (!baseUri.isEmpty()) {
+            converterProperties.setBaseUri(baseUri);
+        }
 
         FileInputStream inputFile = new FileInputStream(file.getAbsolutePath());
 
