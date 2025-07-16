@@ -6,6 +6,8 @@ import com.itextpdf.kernel.pdf.PdfUAConformance;
 import com.itextpdf.kernel.pdf.PdfVersion;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.WriterProperties;
+import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
+import com.itextpdf.styledxmlparser.css.media.MediaType;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -23,6 +25,9 @@ public class ConvertPdfToHtml implements Callable<Integer> {
     @Option(names = {"-b", "--base-uri"}, description = "/var/www/html (default: output directory)", defaultValue = "")
     private String baseUri;
 
+    @Option(names = {"-m", "--media-type"}, description = "Media type to use for conversion (print, screen, etc.)", defaultValue = "")
+    private String mediaType;
+
     @Parameters(index = "0", description = "The file whose checksum to calculate.")
     private File file;
 
@@ -36,6 +41,13 @@ public class ConvertPdfToHtml implements Callable<Integer> {
 
         if (!baseUri.isEmpty()) {
             converterProperties.setBaseUri(baseUri);
+        }
+        if (!mediaType.isEmpty()) {
+            if (!MediaType.isValidMediaType(mediaType)) {
+                System.err.println("Invalid media type: " + mediaType);
+                return 1;
+            }
+            converterProperties.setMediaDeviceDescription(new MediaDeviceDescription(mediaType));
         }
 
         FileInputStream inputFile = new FileInputStream(file.getAbsolutePath());
