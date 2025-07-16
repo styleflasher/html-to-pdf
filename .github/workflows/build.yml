@@ -56,7 +56,7 @@ jobs:
     
     - name: Update version in Java class
       run: |
-        sed -i "s/version = \"htmlToPdf [0-9.]*\"/version = \"htmlToPdf ${{ env.VERSION }}\"/" src/main/java/at/styleflasher/htmltopdf/cli/ConvertPdfToHtml.java
+        sed -i "s/version = \"htmlToPdf 2025\.x\.x-dev\"/version = \"htmlToPdf ${{ env.VERSION }}\"/" src/main/java/at/styleflasher/htmltopdf/cli/ConvertPdfToHtml.java
     
     - name: Build with Maven
       run: mvn -B package --file pom.xml
