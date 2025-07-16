@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 @Command(name = "htmlToPdf",
         description = "Convert HTML to PDF",
         mixinStandardHelpOptions = true,
-        version = "htmlToPdf 2025.x.x-dev")
+        version = "htmlToPdf v2025.07.2")
 public class ConvertPdfToHtml implements Callable<Integer> {
 
     @Option(names = {"-b", "--base-uri"}, description = "/var/www/html (default: output directory)", defaultValue = "")
